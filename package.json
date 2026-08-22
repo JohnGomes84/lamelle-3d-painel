@@ -12,13 +12,17 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:bootstrap-users": "node scripts/bootstrap-users.mjs",
     "check": "pnpm lint && pnpm typecheck && pnpm test"
   },
   "dependencies": {
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
+    "dotenv": "^17.4.2",
     "lucide-react": "latest",
     "next": "latest",
+    "postgres": "^3.4.9",
     "react": "latest",
     "react-dom": "latest",
     "zod": "latest"
