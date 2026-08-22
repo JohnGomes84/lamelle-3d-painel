@@ -1,0 +1,2 @@
+import { AppShell } from "@/components/app-shell";import { requireMembership } from "@/lib/auth/server";import { hasSupabaseEnv } from "@/lib/supabase/server";
+export default async function ProtectedLayout({children}:{children:React.ReactNode}){if(!hasSupabaseEnv())return <AppShell userName="Configuração local">{children}</AppShell>;const{user}=await requireMembership();return <AppShell userName={user.user_metadata?.display_name||user.email||"Equipe Lamelle"}>{children}</AppShell>}

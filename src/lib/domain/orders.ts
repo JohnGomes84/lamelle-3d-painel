@@ -1,0 +1,5 @@
+import { money } from "./money";
+export type OrderItem={quantity:number;unitPrice:number;unitCost:number;individualized:boolean};
+export function volumeDiscountRate(quantity:number,individualized:boolean){if(individualized)return 0;return quantity>=60?.2:quantity>=30?.15:quantity>=10?.1:0}
+export function calculateOrder(items:OrderItem[],paid=0){let gross=0,discount=0,cost=0;for(const i of items){const subtotal=i.quantity*i.unitPrice;gross+=subtotal;discount+=subtotal*volumeDiscountRate(i.quantity,i.individualized);cost+=i.quantity*i.unitCost}const total=gross-discount,minimumDeposit=total*.5;return{gross:money(gross),discount:money(discount),total:money(total),cost:money(cost),profit:money(total-cost),minimumDeposit:money(minimumDeposit),paid:money(paid),balance:money(Math.max(0,total-paid)),depositSatisfied:paid>=minimumDeposit}}
+export function reversePayment(order:{total:number;paid:number},amount:number){const paid=money(Math.max(0,order.paid-amount));return{paid,balance:money(Math.max(0,order.total-paid))}}

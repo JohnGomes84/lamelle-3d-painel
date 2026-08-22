@@ -1,0 +1,2 @@
+import { describe,expect,it } from "vitest";import { sortProductionJobs } from "./production";
+describe("sortProductionJobs",()=>{it("prioriza pedido pago por data do evento",()=>{const jobs=[{id:"p",kind:"portfolio" as const,eventDate:"2026-08-20",depositSatisfied:false},{id:"b",kind:"order" as const,eventDate:"2026-09-10",depositSatisfied:true},{id:"a",kind:"order" as const,eventDate:"2026-09-01",depositSatisfied:true},{id:"u",kind:"order" as const,eventDate:"2026-08-25",depositSatisfied:false}];expect(sortProductionJobs(jobs).map(x=>x.id)).toEqual(["a","b","u","p"])})});

@@ -1,0 +1,5 @@
+import { z } from "zod";
+const collection=z.array(z.record(z.string(),z.unknown()));
+const LegacyBackup=z.object({version:z.literal(2),settings:z.record(z.string(),z.unknown()),products:collection,inventory:collection,clients:collection,orders:collection,production:collection,content:collection,partners:collection,cash:collection});
+export type LegacyBackup=z.infer<typeof LegacyBackup>;
+export function parseLegacyBackup(raw:string){if(new TextEncoder().encode(raw).length>5_000_000)throw new Error("Arquivo de backup grande demais.");let parsed:unknown;try{parsed=JSON.parse(raw)}catch{throw new Error("JSON inválido.")}if((parsed as {version?:unknown})?.version!==2)throw new Error("Versão de backup não suportada.");const data=LegacyBackup.parse(parsed);return{data,counts:{products:data.products.length,inventory:data.inventory.length,clients:data.clients.length,orders:data.orders.length,production:data.production.length,content:data.content.length,partners:data.partners.length,cash:data.cash.length}}}

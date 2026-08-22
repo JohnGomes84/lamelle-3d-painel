@@ -3,3 +3,12 @@ work/*.png
 *.tmp
 .DS_Store
 Thumbs.db
+node_modules/
+.next/
+.vercel/
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
+
+.vercel

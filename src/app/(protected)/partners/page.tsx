@@ -1,0 +1,1 @@
+import{EntityPage}from"@/components/operational/entity-page";import{getRows}from"@/lib/operational/data";export default async function Page(){return <EntityPage area="partners" rows={await getRows("partners")}/>}

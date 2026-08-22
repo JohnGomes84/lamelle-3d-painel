@@ -1,0 +1,3 @@
+"use client";
+import { useActionState } from "react";import { requestLogin,type LoginState } from "@/app/(auth)/login/actions";
+const initial:LoginState={};export function LoginForm(){const[state,action,pending]=useActionState(requestLogin,initial);return <form action={action} className="login-form"><label htmlFor="email">E-mail autorizado</label><input id="email" name="email" type="email" autoComplete="email" required placeholder="voce@exemplo.com"/><button disabled={pending}>{pending?"Enviando…":"Receber link de acesso"}</button>{state.error&&<p className="form-error">{state.error}</p>}{state.success&&<p className="form-success">{state.success}</p>}</form>}

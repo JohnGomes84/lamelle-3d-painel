@@ -1,0 +1,2 @@
+import { redirect } from "next/navigation";import { createClient } from "@/lib/supabase/server";
+export async function requireMembership(){const supabase=await createClient();const {data:{user}}=await supabase.auth.getUser();if(!user)redirect("/login");const {data:membership}=await supabase.from("memberships").select("organization_id,role,status,email").eq("profile_id",user.id).eq("status","active").single();if(!membership)redirect("/unauthorized");return{user,membership,supabase}}

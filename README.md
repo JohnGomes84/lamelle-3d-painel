@@ -2,6 +2,8 @@
 
 Ferramenta offline, em um único HTML, para administrar produtos, precificação, estoque, clientes, pedidos, produção, conteúdo, parceiros e fluxo de caixa da Lamelle 3D.
 
+O repositório também contém a evolução para aplicativo privado na nuvem em Next.js, com Supabase e Vercel. O aplicativo mantém o HTML offline como fallback e adiciona duas contas, dados compartilhados, organização, auditoria, pedidos e pagamentos conectados ao caixa.
+
 ## Abrir o painel
 
 Abra `outputs/painel-lamelle-3d.html` no Chrome ou Microsoft Edge. Não é necessário instalar nada nem iniciar um servidor.
@@ -16,6 +18,16 @@ Com Node.js instalado:
 node work/lamelle-core.test.js
 node work/painel-structure.test.js
 ```
+
+Para o aplicativo na nuvem:
+
+```powershell
+pnpm install
+pnpm check
+pnpm build
+```
+
+Consulte `docs/LOCAL-DEVELOPMENT.md` e `docs/PRODUCTION.md`.
 
 ## Estrutura
 

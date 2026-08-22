@@ -1,0 +1,2 @@
+import { hasSupabaseEnv } from "@/lib/supabase/server";import { requireMembership } from "@/lib/auth/server";import { configs,type Area } from "./config";
+export async function getRows(area:Area){if(!hasSupabaseEnv())return[];const{membership,supabase}=await requireMembership();const{data,error}=await supabase.from(configs[area].table).select("*").eq("organization_id",membership.organization_id).order("created_at",{ascending:false});if(error)throw new Error("Não foi possível carregar os dados.");return data as (Record<string,unknown>&{id:string})[]}

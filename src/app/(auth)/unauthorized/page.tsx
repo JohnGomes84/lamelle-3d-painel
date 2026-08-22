@@ -1,0 +1,1 @@
+export default function Unauthorized(){return <main className="login-page"><section className="login-card"><span className="eyebrow">Acesso restrito</span><h1>Convite necessário.</h1><p>Esta conta ainda não faz parte da organização Lamelle 3D.</p></section></main>}
