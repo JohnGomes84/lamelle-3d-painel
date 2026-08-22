@@ -1,0 +1,5 @@
+work/edge-profile/
+work/*.png
+*.tmp
+.DS_Store
+Thumbs.db
