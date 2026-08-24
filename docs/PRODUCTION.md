@@ -10,7 +10,7 @@ Antes da primeira liberação:
 
 1. concluir a integração Supabase no Marketplace da Vercel;
 2. aplicar `0001_initial_schema.sql` e `0002_order_transactions.sql`;
-3. definir os e-mails da proprietária e da sócia;
+3. definir os e-mails do proprietário e da sócia;
 4. criar a organização Lamelle 3D e os dois vínculos;
 5. confirmar login, isolamento por organização, pedido, pagamento, caixa e exportação em Preview;
 6. promover somente após `pnpm check` e `pnpm build` passarem.

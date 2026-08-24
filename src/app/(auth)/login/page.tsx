@@ -1,2 +1,2 @@
 import { BrandMark } from "@/components/brand-mark";import { LoginForm } from "@/components/auth/login-form";
-export default function LoginPage(){return <main className="login-page"><section className="login-card"><BrandMark/><div><span className="eyebrow">Acesso privado</span><h1>Entre no ateliê.</h1><p>Use um e-mail convidado para acessar os dados compartilhados da Lamelle 3D.</p></div><LoginForm/></section></main>}
+export default function LoginPage(){return <main className="login-page"><section className="login-card"><BrandMark/><div><span className="eyebrow">Acesso privado</span><h1>Entre no ateliê.</h1><p>Use seu e-mail autorizado e sua senha para acessar a Lamelle 3D.</p></div><LoginForm/></section></main>}
