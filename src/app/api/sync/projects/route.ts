@@ -21,7 +21,11 @@ export async function POST(request: Request) {
   if (!org && hash === INITIAL_SYNC_TOKEN_SHA256) {
     // Ateliê com uma única organização: usa a que existir (o slug pode ter sido criado diferente).
     const { data: orgs, error } = await admin.from("organizations").select("id,slug,settings").limit(2);
-    if (error) return Response.json({ error: `Não foi possível ler a organização: ${error.message}` }, { status: 500 });
+    if (error) {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "", key = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+      let host = "inválida"; try { host = new URL(url.trim()).hostname; } catch {}
+      return Response.json({ error: `Não foi possível ler a organização: ${error.message}`, details: error.details, diagnostico: { supabaseHost: host, urlComEspacos: url !== url.trim(), chaveComEspacos: key !== key.trim(), chaveTamanho: key.trim().length } }, { status: 500 });
+    }
     org = orgs?.find((o) => o.slug === "lamelle-3d") ?? (orgs?.length === 1 ? orgs[0] : null);
     if (!org) return Response.json({ error: `Organização não encontrada (${orgs?.length ?? 0} visível(is) para a chave administrativa).` }, { status: 403 });
   }
