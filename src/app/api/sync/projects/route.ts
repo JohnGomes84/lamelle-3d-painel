@@ -18,7 +18,13 @@ export async function POST(request: Request) {
   // A chave vale se o hash estiver nos ajustes da organização ou for a chave inicial do ateliê
   // (necessária para a primeira sincronização criar a tabela, antes da migração gravar o hash).
   let { data: org } = await admin.from("organizations").select("id,settings").eq("settings->>projectsSyncTokenSha256", hash).maybeSingle();
-  if (!org && hash === INITIAL_SYNC_TOKEN_SHA256) ({ data: org } = await admin.from("organizations").select("id,settings").eq("slug", "lamelle-3d").maybeSingle());
+  if (!org && hash === INITIAL_SYNC_TOKEN_SHA256) {
+    // Ateliê com uma única organização: usa a que existir (o slug pode ter sido criado diferente).
+    const { data: orgs, error } = await admin.from("organizations").select("id,slug,settings").limit(2);
+    if (error) return Response.json({ error: `Não foi possível ler a organização: ${error.message}` }, { status: 500 });
+    org = orgs?.find((o) => o.slug === "lamelle-3d") ?? (orgs?.length === 1 ? orgs[0] : null);
+    if (!org) return Response.json({ error: `Organização não encontrada (${orgs?.length ?? 0} visível(is) para a chave administrativa).` }, { status: 403 });
+  }
   if (!org) return Response.json({ error: "Chave de sincronização inválida." }, { status: 403 });
 
   let body: unknown;
