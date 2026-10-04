@@ -1,35 +1,17 @@
-import { createHash } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ensureProjectsSchema } from "@/lib/db/projects-schema";
+import { orgFromSyncToken } from "@/lib/auth/sync-token";
 import { normalizeStatus, plateTotals, pricingSettingsFrom, productMultiplier, syncPayloadSchema } from "@/lib/domain/projects";
 
 export const dynamic = "force-dynamic";
-const INITIAL_SYNC_TOKEN_SHA256 = "ae9d188073404004d90a21ed7cfe0c5b4fbb1232686bcb5d352f7fe37c5595e8";
 
 /** Recebe os projetos da pasta Projetos3D (script no PC) e atualiza Projetos + Produtos. */
 export async function POST(request: Request) {
-  const token = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
-  if (token.length < 32) return Response.json({ error: "Chave de sincronização ausente." }, { status: 401 });
-  const hash = createHash("sha256").update(token).digest("hex");
-
   let admin;
   try { admin = createAdminClient(); } catch { return Response.json({ error: "Servidor sem credenciais administrativas." }, { status: 500 }); }
-
-  // A chave vale se o hash estiver nos ajustes da organização ou for a chave inicial do ateliê
-  // (necessária para a primeira sincronização criar a tabela, antes da migração gravar o hash).
-  let { data: org } = await admin.from("organizations").select("id,settings").eq("settings->>projectsSyncTokenSha256", hash).maybeSingle();
-  if (!org && hash === INITIAL_SYNC_TOKEN_SHA256) {
-    // Ateliê com uma única organização: usa a que existir (o slug pode ter sido criado diferente).
-    const { data: orgs, error } = await admin.from("organizations").select("id,slug,settings").limit(2);
-    if (error) {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "", key = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-      let host = "inválida"; try { host = new URL(url.trim()).hostname; } catch {}
-      return Response.json({ error: `Não foi possível ler a organização: ${error.message}`, details: error.details, diagnostico: { supabaseHost: host, urlComEspacos: url !== url.trim(), chaveComEspacos: key !== key.trim(), chaveTamanho: key.trim().length } }, { status: 500 });
-    }
-    org = orgs?.find((o) => o.slug === "lamelle-3d") ?? (orgs?.length === 1 ? orgs[0] : null);
-    if (!org) return Response.json({ error: `Organização não encontrada (${orgs?.length ?? 0} visível(is) para a chave administrativa).` }, { status: 403 });
-  }
-  if (!org) return Response.json({ error: "Chave de sincronização inválida." }, { status: 403 });
+  const auth = await orgFromSyncToken(request, admin);
+  if (auth.error) return auth.error;
+  const org = auth.org;
 
   let body: unknown;
   try { body = await request.json(); } catch { return Response.json({ error: "JSON inválido." }, { status: 400 }); }

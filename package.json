@@ -15,7 +15,7 @@
     "db:migrate": "node scripts/migrate.mjs",
     "db:bootstrap-users": "node scripts/bootstrap-users.mjs",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
-    "vercel-build": "node scripts/migrate.mjs --optional && next build"
+    "vercel-build": "node scripts/migrate.mjs --optional && (node scripts/bootstrap-users.mjs || echo \"AVISO: acessos não preparados no build\") && next build"
   },
   "dependencies": {
     "@supabase/ssr": "latest",
