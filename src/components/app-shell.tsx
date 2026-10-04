@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { BarChart3, Boxes, CalendarClock, CircleDollarSign, ContactRound, Handshake, LayoutDashboard, PackageOpen, Settings, ShoppingBag } from "lucide-react";
+import { BarChart3, Boxes, Box, CalendarClock, CircleDollarSign, ContactRound, Handshake, LayoutDashboard, PackageOpen, Settings, ShoppingBag } from "lucide-react";
 import { BrandMark } from "./brand-mark";
 
 const links = [
-  ["/dashboard", "Visão mensal", LayoutDashboard], ["/products", "Produtos", PackageOpen],
+  ["/dashboard", "Visão mensal", LayoutDashboard], ["/projects", "Projetos", Box], ["/products", "Produtos", PackageOpen],
   ["/inventory", "Estoque", Boxes], ["/clients", "Clientes", ContactRound],
   ["/orders", "Pedidos", ShoppingBag], ["/production", "Produção", CalendarClock],
   ["/content", "Conteúdo", BarChart3], ["/partners", "Parceiros", Handshake],
