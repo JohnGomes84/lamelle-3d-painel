@@ -1,8 +1,10 @@
 import { createHash } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { ensureProjectsSchema } from "@/lib/db/projects-schema";
 import { normalizeStatus, plateTotals, pricingSettingsFrom, productMultiplier, syncPayloadSchema } from "@/lib/domain/projects";
 
 export const dynamic = "force-dynamic";
+const INITIAL_SYNC_TOKEN_SHA256 = "ae9d188073404004d90a21ed7cfe0c5b4fbb1232686bcb5d352f7fe37c5595e8";
 
 /** Recebe os projetos da pasta Projetos3D (script no PC) e atualiza Projetos + Produtos. */
 export async function POST(request: Request) {
@@ -13,13 +15,24 @@ export async function POST(request: Request) {
   let admin;
   try { admin = createAdminClient(); } catch { return Response.json({ error: "Servidor sem credenciais administrativas." }, { status: 500 }); }
 
-  const { data: org } = await admin.from("organizations").select("id,settings").eq("settings->>projectsSyncTokenSha256", hash).maybeSingle();
+  // A chave vale se o hash estiver nos ajustes da organização ou for a chave inicial do ateliê
+  // (necessária para a primeira sincronização criar a tabela, antes da migração gravar o hash).
+  let { data: org } = await admin.from("organizations").select("id,settings").eq("settings->>projectsSyncTokenSha256", hash).maybeSingle();
+  if (!org && hash === INITIAL_SYNC_TOKEN_SHA256) ({ data: org } = await admin.from("organizations").select("id,settings").eq("slug", "lamelle-3d").maybeSingle());
   if (!org) return Response.json({ error: "Chave de sincronização inválida." }, { status: 403 });
 
   let body: unknown;
   try { body = await request.json(); } catch { return Response.json({ error: "JSON inválido." }, { status: 400 }); }
   const parsed = syncPayloadSchema.safeParse(body);
   if (!parsed.success) return Response.json({ error: "Dados inválidos.", issues: parsed.error.issues.slice(0, 10) }, { status: 422 });
+
+  // Tabela ainda não criada (migração não rodou no build): cria agora.
+  const probe = await admin.from("projects").select("id").limit(1);
+  if (probe.error) {
+    const created = await ensureProjectsSchema();
+    if (!created.ok) return Response.json({ error: `Tabela de projetos indisponível: ${probe.error.message}. Criação automática falhou: ${created.error}` }, { status: 503 });
+    await new Promise((r) => setTimeout(r, 1500)); // PostgREST recarrega o schema
+  }
 
   const settings = pricingSettingsFrom(org.settings);
   const now = new Date().toISOString();

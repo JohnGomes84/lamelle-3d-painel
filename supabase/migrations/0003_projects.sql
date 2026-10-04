@@ -36,3 +36,6 @@ create index if not exists products_org_project on public.products(organization_
 update public.organizations
 set settings = settings || jsonb_build_object('projectsSyncTokenSha256', 'ae9d188073404004d90a21ed7cfe0c5b4fbb1232686bcb5d352f7fe37c5595e8')
 where slug = 'lamelle-3d';
+
+-- Faz a API (PostgREST) enxergar a tabela nova na hora.
+notify pgrst, 'reload schema';
